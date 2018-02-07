@@ -17,25 +17,17 @@ sub visit {
 
     if ( $type eq 'ARRAY' ) {
         for my $v (@$ref) {
-            if ( ref($v) ) {
-                visit( $v, $fcn );
-            }
-            else {
-                local $_ = $v;
-                $fcn->();
-            }
+            local $_ = $v;
+            $fcn->();
+            visit( $v, $fcn ) if ref($v) eq 'ARRAY' || ref($v) eq 'HASH';
         }
     }
     elsif ( $type eq 'HASH' ) {
         for my $k ( keys %$ref ) {
             my $v = $ref->{$k};
-            if ( ref($v) ) {
-                visit( $v, $fcn );
-            }
-            else {
-                local $_ = $v;
-                $fcn->();
-            }
+            local $_ = $v;
+            $fcn->();
+            visit( $v, $fcn ) if ref($v) eq 'ARRAY' || ref($v) eq 'HASH';
         }
     }
     else {

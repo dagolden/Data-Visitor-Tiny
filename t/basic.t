@@ -52,7 +52,20 @@ subtest "Visit hashref" => sub {
 
 subtest "Visit deep" => sub {
     my @values;
-    visit( $deep, sub { push @values, $_ } );
+    my %count;
+    visit(
+        $deep,
+        sub {
+            if (ref) {
+                $count{ ref($_) }++;
+            }
+            else {
+                push @values, $_;
+            }
+        }
+    );
+    is( $count{ARRAY}, 3, "Saw 3 arrayrefs" );
+    is( $count{HASH},  7, "Saw 7 hashrefs" );
     is_deeply( [ sort @values ], [ sort @deep_leaves ],
         "visting saw all values in \$_" );
 };
