@@ -18,8 +18,10 @@ our @EXPORT = qw/visit/;
 
 The C<visit> function takes a hashref or arrayref and recursively visits
 all values via pre-order traversal, calling the provided callback for each
-value.  Only hashrefs and arrayrefs are recursed into; objects, even if they
-override hash or array dereference, are only ever treated as values;
+value.  Only hashrefs and arrayrefs are traversed; objects, even if they
+override hash or array dereference, are only ever treated as values.  Hash
+keys are sorted lexicographically before iteration, ensuring consistent
+visitation order in the face of Perl's hash order randomization.
 
 Within the callback, the C<$_> variable is set to the value of the node.
 The callback also receives three arguments: C<$key>, C<$valueref>, and
@@ -76,7 +78,7 @@ sub _visit {
         d => { e => 3, f => 4 },
     };
 
-    # print leaf (non-ref) values
+    # print leaf (non-ref) values on separate lines (1 2 3 4)
     visit( $hoh, sub { return if ref; say } );
 
     # transform leaf value for a given key

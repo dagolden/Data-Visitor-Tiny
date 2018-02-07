@@ -9,7 +9,7 @@ my $hoh = {
     d => { e => 3, f => 4 },
 };
 
-# print leaf (non-ref) values
+# print leaf (non-ref) values on separate lines (1 2 3 4)
 visit( $hoh, sub { return if ref; say } );
 
 # transform leaf value for a given key
