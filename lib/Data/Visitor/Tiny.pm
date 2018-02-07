@@ -16,7 +16,7 @@ sub visit {
     my ( $ref, $fcn ) = @_;
     my $ctx = { _depth => 0 };
     _visit( $ref, $fcn, $ctx );
-    return;
+    return $ctx;
 }
 
 sub _visit {

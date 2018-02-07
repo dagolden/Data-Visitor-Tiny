@@ -41,7 +41,8 @@ subtest "Callback gets arguments" => sub {
         is( $c->{_depth}, 0,   "arg 2 correct" );
     };
     my @values;
-    visit( { a => 1 }, $fcn );
+    my $ret = visit( { a => 1 }, $fcn );
+    is( $ret->{_depth}, 0, "visit returns the context" );
 };
 
 subtest "Depth context" => sub {
