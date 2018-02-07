@@ -5,7 +5,7 @@ use warnings;
 package Data::Visitor::Tiny;
 # ABSTRACT: Recursively walk data structures
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Carp qw/croak/;
 use Exporter 5.57 qw/import/;
