@@ -7,6 +7,7 @@ package Data::Visitor::Tiny;
 
 our $VERSION = '0.001';
 
+use Carp qw/croak/;
 use Exporter 5.57 qw/import/;
 
 our @EXPORT = qw/visit/;
@@ -21,21 +22,16 @@ sub visit {
 sub _visit {
     my ( $ref, $fcn, $ctx ) = @_;
     my $type = ref($ref);
+    croak("'$ref' is not an ARRAY or HASH")
+      unless $type eq 'ARRAY' || $type eq 'HASH';
     my @elems = $type eq 'ARRAY' ? ( 0 .. $#$ref ) : ( sort keys %$ref );
     for my $idx (@elems) {
         my ( $v, $vr );
-        if ( $type eq 'ARRAY' ) {
-            $v  = $ref->[$idx];
-            $vr = \( $ref->[$idx] );
-        }
-        else {
-            $v  = $ref->{$idx};
-            $vr = \( $ref->{$idx} );
-        }
+        $v  = $type eq 'ARRAY' ? $ref->[$idx]      : $ref->{$idx};
+        $vr = $type eq 'ARRAY' ? \( $ref->[$idx] ) : \( $ref->{$idx} );
         local $_ = $v;
-        my $t = ref($v);
         $fcn->( $idx, $ctx, $vr );
-        visit( $v, $fcn ) if $t eq 'ARRAY' || $t eq 'HASH';
+        visit( $v, $fcn ) if ref($v) eq 'ARRAY' || ref($v) eq 'HASH';
     }
 }
 
