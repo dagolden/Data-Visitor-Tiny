@@ -13,27 +13,30 @@ our @EXPORT = qw/visit/;
 
 sub visit {
     my ( $ref, $fcn ) = @_;
+    my $ctx = { _depth => 0 };
+    _visit( $ref, $fcn, $ctx );
+    return;
+}
+
+sub _visit {
+    my ( $ref, $fcn, $ctx ) = @_;
     my $type = ref($ref);
-
-    if ( $type eq 'ARRAY' ) {
-        for my $v (@$ref) {
-            local $_ = $v;
-            $fcn->();
-            visit( $v, $fcn ) if ref($v) eq 'ARRAY' || ref($v) eq 'HASH';
+    my @elems = $type eq 'ARRAY' ? ( 0 .. $#$ref ) : ( sort keys %$ref );
+    for my $idx (@elems) {
+        my ( $v, $vr );
+        if ( $type eq 'ARRAY' ) {
+            $v  = $ref->[$idx];
+            $vr = \( $ref->[$idx] );
         }
-    }
-    elsif ( $type eq 'HASH' ) {
-        for my $k ( keys %$ref ) {
-            my $v = $ref->{$k};
-            local $_ = $v;
-            $fcn->();
-            visit( $v, $fcn ) if ref($v) eq 'ARRAY' || ref($v) eq 'HASH';
+        else {
+            $v  = $ref->{$idx};
+            $vr = \( $ref->{$idx} );
         }
+        local $_ = $v;
+        my $t = ref($v);
+        $fcn->( $idx, $ctx, $vr );
+        visit( $v, $fcn ) if $t eq 'ARRAY' || $t eq 'HASH';
     }
-    else {
-        ...;
-    }
-
 }
 
 1;
